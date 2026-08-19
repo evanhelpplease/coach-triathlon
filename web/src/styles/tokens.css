@@ -1,0 +1,92 @@
+/* Jetons de design — portage de Packages/DesignSystem/.../DSTokens.swift.
+   Identité « triathlon premium » : eau (aqua), route (orange), effort (lime),
+   dark mode natif soigné. Le web est dark-first (comme l'app). */
+
+:root {
+  /* Fonds & surfaces (dark natif) */
+  --bg: #0a0e13;
+  --surface: #131a22;
+  --surface-elevated: #1b2530;
+  --separator: #263141;
+
+  /* Texte */
+  --text-primary: #f2f6fb;
+  --text-secondary: #9db0c2;
+  --text-tertiary: #5e7183;
+
+  /* Marque */
+  --primary: #16c0d4; /* aqua / eau */
+  --accent: #c6f24e; /* lime / effort */
+
+  /* Disciplines */
+  --swim: #39b7f5;
+  --bike: #ff8a50;
+  --run: #4cd787;
+  --strength: #b48cf0;
+
+  /* États */
+  --success: #3fd98a;
+  --warning: #ffb23e;
+  --danger: #ff6b6b;
+
+  /* Espacements */
+  --sp-xxs: 4px;
+  --sp-xs: 8px;
+  --sp-sm: 12px;
+  --sp-md: 16px;
+  --sp-lg: 24px;
+  --sp-xl: 32px;
+  --sp-xxl: 48px;
+
+  /* Rayons */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-pill: 999px;
+
+  --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 700;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: var(--primary);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}

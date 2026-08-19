@@ -1,0 +1,53 @@
+# Variante « test gratuit » : app seule, sans widget/Live Activity, entitlements
+# vides → signable avec un Apple ID gratuit. Génère avec :
+#   xcodegen generate --spec project-free.yml
+# Reviens ensuite à la version complète avec : xcodegen generate
+name: CoachTriathlon
+options:
+  bundleIdPrefix: com.evanblanchard
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+
+packages:
+  TriathlonEngine:
+    path: Packages/TriathlonEngine
+  DesignSystem:
+    path: Packages/DesignSystem
+
+targets:
+  CoachTriathlon:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: App
+      - path: Shared
+    dependencies:
+      - package: TriathlonEngine
+      - package: DesignSystem
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Coach Tri
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        NSHealthShareUsageDescription: "Coach Tri lit tes activités, ton sommeil et ta récupération pour adapter ton plan."
+        NSHealthUpdateUsageDescription: "Coach Tri enregistre tes séances réalisées dans Apple Santé."
+        NSCalendarsFullAccessUsageDescription: "Coach Tri ajoute tes séances à ton calendrier et les tient à jour."
+        NSLocationWhenInUseUsageDescription: "Ta position sert uniquement à afficher la météo locale et adapter tes séances extérieures."
+    settings:
+      base:
+        SWIFT_VERSION: "5.0"
+        PRODUCT_BUNDLE_IDENTIFIER: com.evanblanchard.coachtriathlon
+        CODE_SIGN_ENTITLEMENTS: App/CoachTriathlon-free.entitlements
+        TARGETED_DEVICE_FAMILY: "1"
+        ENABLE_PREVIEWS: "YES"

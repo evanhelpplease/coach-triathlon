@@ -1,0 +1,81 @@
+name: CoachTriathlon
+options:
+  bundleIdPrefix: com.evanblanchard
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+
+packages:
+  TriathlonEngine:
+    path: Packages/TriathlonEngine
+  DesignSystem:
+    path: Packages/DesignSystem
+
+targets:
+  CoachTriathlon:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: App
+      - path: Shared
+    dependencies:
+      - package: TriathlonEngine
+      - package: DesignSystem
+      - target: CoachTriWidget
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Coach Tri
+        UILaunchScreen: {}
+        NSSupportsLiveActivities: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        NSHealthShareUsageDescription: "Coach Tri lit tes activités, ton sommeil et ta récupération pour adapter ton plan."
+        NSHealthUpdateUsageDescription: "Coach Tri enregistre tes séances réalisées dans Apple Santé."
+        NSCalendarsFullAccessUsageDescription: "Coach Tri ajoute tes séances à ton calendrier et les tient à jour."
+        NSLocationWhenInUseUsageDescription: "Ta position sert uniquement à afficher la météo locale et adapter tes séances extérieures."
+        UIBackgroundModes:
+          - fetch
+          - processing
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.evanblanchard.coachtriathlon.refresh
+    settings:
+      base:
+        # Swift 5 language mode : évite le durcissement strict-concurrency sur
+        # tout le code UI en Phase 1 (migration Swift 6 possible plus tard).
+        SWIFT_VERSION: "5.0"
+        PRODUCT_BUNDLE_IDENTIFIER: com.evanblanchard.coachtriathlon
+        CODE_SIGN_ENTITLEMENTS: App/CoachTriathlon.entitlements
+        TARGETED_DEVICE_FAMILY: "1"
+        ENABLE_PREVIEWS: "YES"
+
+  CoachTriWidget:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Widget
+      - path: Shared
+    dependencies:
+      - package: DesignSystem
+    info:
+      path: Widget/Info.plist
+      properties:
+        CFBundleDisplayName: Coach Tri
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        SWIFT_VERSION: "5.0"
+        PRODUCT_BUNDLE_IDENTIFIER: com.evanblanchard.coachtriathlon.widget
+        CODE_SIGN_ENTITLEMENTS: Widget/CoachTriWidget.entitlements
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: "NO"

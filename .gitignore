@@ -1,0 +1,21 @@
+# Swift / SwiftPM
+.build/
+.swiftpm/
+Package.resolved
+
+# Xcode
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+DerivedData/
+*.xcuserstate
+
+# Projet généré par XcodeGen (recréé via `xcodegen generate`)
+CoachTriathlon.xcodeproj/
+
+# macOS
+.DS_Store
+
+# Secrets (clés API, OAuth)
+Secrets.xcconfig
+*.env
+App/Info.plist
