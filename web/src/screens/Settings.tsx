@@ -6,6 +6,7 @@ import { Card, SectionTitle, Banner } from '../ui/components';
 import { mmss } from '../ui/format';
 import { SportDaysEditor, UnavailabilityEditor } from '../ui/planningEditors';
 import { canInstall, promptInstall, isStandalone } from '../pwa/install';
+import { AuthPanel } from './AuthPanel';
 
 const PROGRESSIONS: { value: ProgressionLevel; label: string; desc: string }[] = [
   { value: 'prudent', label: 'Prudent', desc: 'Montée douce, risque de blessure minimal.' },
@@ -25,11 +26,6 @@ export function Settings() {
   const exportData = useStore((s) => s.exportData);
   const importData = useStore((s) => s.importData);
   const update = useStore((s) => s.update);
-  const cloudUser = useStore((s) => s.cloudUser);
-  const cloudStatus = useStore((s) => s.cloudStatus);
-  const cloudAvailable = useStore((s) => s.cloudAvailable);
-  const signInCloud = useStore((s) => s.signInCloud);
-  const signOutCloud = useStore((s) => s.signOutCloud);
   const addUnavailability = useStore((s) => s.addUnavailability);
   const removeUnavailability = useStore((s) => s.removeUnavailability);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -125,33 +121,9 @@ export function Settings() {
         <div className="tertiary small">Accès restreint : l'app crée un calendrier <b>« Coach Triathlon IA »</b> dédié et n'écrit que dedans — elle ne voit ni ne modifie tes autres événements. Prérequis : projet Google Cloud, Calendar API activée, OAuth client ID (Web) avec ton origine GitHub Pages. La synchro se lance depuis l'onglet Plan.</div>
       </Card>
 
-      <SectionTitle>Synchro cloud (multi-appareils)</SectionTitle>
-      <Card>
-        {cloudUser ? (
-          <>
-            <div className="row between">
-              <div>
-                <div style={{ fontWeight: 600 }}>☁️ Connecté</div>
-                <div className="tertiary small">{cloudUser.email ?? cloudUser.name ?? cloudUser.uid}</div>
-              </div>
-              <button className="btn ghost" onClick={() => void signOutCloud()}>Se déconnecter</button>
-            </div>
-            <div className="tertiary small" style={{ marginTop: 8 }}>Tes données se synchronisent en temps réel entre tes appareils (Firestore).</div>
-          </>
-        ) : cloudAvailable ? (
-          <>
-            <div className="tertiary small" style={{ marginBottom: 10 }}>
-              Connecte-toi avec Google pour synchroniser profil, plan et journal sur tous tes appareils (PC + téléphone).
-            </div>
-            <button className="btn primary block" onClick={() => void signInCloud()}>🔓 Se connecter avec Google</button>
-          </>
-        ) : (
-          <div className="tertiary small">
-            Firebase non configuré sur ce déploiement. Ajoute les variables <code>VITE_FIREBASE_*</code> (voir web/README.md) puis rebuild pour activer la synchro cloud. En attendant, l'export/import JSON ci-dessous fait le pont entre appareils.
-          </div>
-        )}
-        {cloudStatus && <div className="banner" style={{ marginTop: 10 }}>{cloudStatus}</div>}
-      </Card>
+      <SectionTitle>Compte & synchro (multi-appareils)</SectionTitle>
+      <AuthPanel />
+      <div className="tertiary small" style={{ marginTop: 'var(--sp-xs)' }}>Connecte-toi avec le même compte sur ton téléphone et ton ordinateur pour retrouver le même plan partout.</div>
 
       <SectionTitle>Données & sauvegarde</SectionTitle>
       <Card>

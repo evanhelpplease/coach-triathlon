@@ -3,7 +3,9 @@
 // charger Firebase quand la synchro cloud n'est pas utilisée.
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 import {
-  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, type Auth, type User,
+  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail,
+  type Auth, type User,
 } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, onSnapshot, type Firestore, type DocumentReference } from 'firebase/firestore';
 import type { AppData } from '../app/model';
@@ -77,7 +79,12 @@ export class FirebaseProvider implements SyncProvider {
 /** Connexion Google (popup) → renvoie le provider cloud prêt + l'utilisateur. */
 export async function signInWithGoogle(): Promise<{ provider: FirebaseProvider; user: CloudUser; db: Firestore }> {
   const { auth, db } = ensureInit();
-  const cred = await signInWithPopup(auth, new GoogleAuthProvider());
+  let cred;
+  try {
+    cred = await signInWithPopup(auth, new GoogleAuthProvider());
+  } catch (e) {
+    throw new Error(authErrorMessage(e));
+  }
   const u = cred.user;
   return {
     provider: new FirebaseProvider(db, u.uid),
@@ -88,6 +95,53 @@ export async function signInWithGoogle(): Promise<{ provider: FirebaseProvider; 
 
 export async function signOutFirebase(): Promise<void> {
   if (auth) await signOut(auth);
+}
+
+/** Message d'erreur d'authentification en français. */
+function authErrorMessage(e: unknown): string {
+  const code = (e as { code?: string })?.code ?? '';
+  switch (code) {
+    case 'auth/email-already-in-use': return 'Un compte existe déjà avec cet e-mail — connecte-toi.';
+    case 'auth/invalid-email': return 'Adresse e-mail invalide.';
+    case 'auth/weak-password': return 'Mot de passe trop faible (6 caractères minimum).';
+    case 'auth/wrong-password':
+    case 'auth/invalid-credential': return 'E-mail ou mot de passe incorrect.';
+    case 'auth/user-not-found': return 'Aucun compte pour cet e-mail.';
+    case 'auth/too-many-requests': return 'Trop de tentatives, réessaie dans un moment.';
+    case 'auth/popup-closed-by-user': return 'Fenêtre fermée avant la fin.';
+    case 'auth/operation-not-allowed': return 'Ce mode de connexion n\'est pas activé dans Firebase.';
+    default: return 'Échec de la connexion. Réessaie.';
+  }
+}
+
+/** Crée un compte e-mail/mot de passe (l'observeAuth branche ensuite la synchro). */
+export async function signUpEmail(email: string, password: string): Promise<void> {
+  const { auth } = ensureInit();
+  try {
+    await createUserWithEmailAndPassword(auth, email.trim(), password);
+  } catch (e) {
+    throw new Error(authErrorMessage(e));
+  }
+}
+
+/** Connexion e-mail/mot de passe. */
+export async function signInEmail(email: string, password: string): Promise<void> {
+  const { auth } = ensureInit();
+  try {
+    await signInWithEmailAndPassword(auth, email.trim(), password);
+  } catch (e) {
+    throw new Error(authErrorMessage(e));
+  }
+}
+
+/** Envoi d'un e-mail de réinitialisation du mot de passe. */
+export async function resetPassword(email: string): Promise<void> {
+  const { auth } = ensureInit();
+  try {
+    await sendPasswordResetEmail(auth, email.trim());
+  } catch (e) {
+    throw new Error(authErrorMessage(e));
+  }
 }
 
 /** Observe l'état d'auth (reconnexion silencieuse au rechargement). */

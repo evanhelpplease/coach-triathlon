@@ -71,6 +71,9 @@ interface AppStore {
   importData: (file: File) => Promise<void>;
 
   signInCloud: () => Promise<void>;
+  signUpEmail: (email: string, password: string) => Promise<void>;
+  signInEmail: (email: string, password: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   signOutCloud: () => Promise<void>;
 }
 
@@ -243,6 +246,23 @@ export const useStore = create<AppStore>((set, get) => {
       } catch (e) {
         set({ cloudStatus: `Échec : ${(e as Error).message}` });
       }
+    },
+
+    signUpEmail: async (email, password) => {
+      set({ cloudStatus: 'Création du compte…' });
+      const mod = await import('../persistence/firebaseProvider');
+      await mod.signUpEmail(email, password); // le handler observeAuth branche la synchro
+    },
+
+    signInEmail: async (email, password) => {
+      set({ cloudStatus: 'Connexion…' });
+      const mod = await import('../persistence/firebaseProvider');
+      await mod.signInEmail(email, password);
+    },
+
+    resetPassword: async (email) => {
+      const mod = await import('../persistence/firebaseProvider');
+      await mod.resetPassword(email);
     },
 
     signOutCloud: async () => {

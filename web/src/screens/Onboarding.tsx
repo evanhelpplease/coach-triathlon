@@ -6,6 +6,7 @@ import {
 import { useStore } from '../app/store';
 import { Card } from '../ui/components';
 import { parseClock } from '../ui/format';
+import { AuthPanel } from './AuthPanel';
 
 interface Draft {
   birthDate: string;
@@ -59,6 +60,7 @@ export function Onboarding() {
   const [d, setD] = useState<Draft>(initial);
   const loadDemo = useStore((s) => s.loadDemo);
   const completeOnboarding = useStore((s) => s.completeOnboarding);
+  const cloudAvailable = useStore((s) => s.cloudAvailable);
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setD((prev) => ({ ...prev, [k]: v }));
 
   function finish() {
@@ -102,14 +104,25 @@ export function Onboarding() {
       </div>
 
       {step === 0 && (
-        <Card>
-          <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>Coach Triathlon IA 🏊🚴🏃</h2>
-          <p className="muted small">Un coach adaptatif : plan périodisé vers ta course, ajusté chaque jour selon ta forme, ton matériel et tes blessures. Français, métrique, 100 % local.</p>
-          <div className="stack-sm" style={{ marginTop: 'var(--sp-md)' }}>
-            <button className="btn primary block" onClick={() => setStep(1)}>Créer mon profil</button>
-            <button className="btn ghost block" onClick={loadDemo}>🎭 Charger un athlète démo</button>
-          </div>
-        </Card>
+        <>
+          <Card>
+            <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>Coach Triathlon IA 🏊🚴🏃</h2>
+            <p className="muted small">Un coach adaptatif : plan périodisé vers ta course, ajusté chaque jour selon ta forme, ton matériel et tes blessures. Français, métrique.</p>
+            <div className="stack-sm" style={{ marginTop: 'var(--sp-md)' }}>
+              <button className="btn primary block" onClick={() => setStep(1)}>Créer mon profil</button>
+              <button className="btn ghost block" onClick={loadDemo}>🎭 Charger un athlète démo</button>
+            </div>
+          </Card>
+          {cloudAvailable && (
+            <>
+              <div className="section-title" style={{ marginTop: 'var(--sp-lg)' }}>Déjà un compte ? Retrouve tes données</div>
+              <AuthPanel />
+              <div className="tertiary small" style={{ marginTop: 'var(--sp-xs)', textAlign: 'center' }}>
+                Connecte-toi pour synchroniser ton plan entre ton téléphone et ton ordinateur.
+              </div>
+            </>
+          )}
+        </>
       )}
 
       {step === 1 && (
