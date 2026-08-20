@@ -58,9 +58,10 @@ const LEVELS: { v: SkillLevel; l: string }[] = [
 export function Onboarding() {
   const [step, setStep] = useState(0);
   const [d, setD] = useState<Draft>(initial);
-  const loadDemo = useStore((s) => s.loadDemo);
   const completeOnboarding = useStore((s) => s.completeOnboarding);
   const cloudAvailable = useStore((s) => s.cloudAvailable);
+  const cloudUser = useStore((s) => s.cloudUser);
+  const signOutCloud = useStore((s) => s.signOutCloud);
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setD((prev) => ({ ...prev, [k]: v }));
 
   function finish() {
@@ -108,19 +109,29 @@ export function Onboarding() {
           <Card>
             <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>Coach Triathlon IA 🏊🚴🏃</h2>
             <p className="muted small">Un coach adaptatif : plan périodisé vers ta course, ajusté chaque jour selon ta forme, ton matériel et tes blessures. Français, métrique.</p>
-            <div className="stack-sm" style={{ marginTop: 'var(--sp-md)' }}>
-              <button className="btn primary block" onClick={() => setStep(1)}>Créer mon profil</button>
-              <button className="btn ghost block" onClick={loadDemo}>🎭 Charger un athlète démo</button>
-            </div>
           </Card>
-          {cloudAvailable && (
+
+          {cloudAvailable && !cloudUser && (
             <>
-              <div className="section-title" style={{ marginTop: 'var(--sp-lg)' }}>Déjà un compte ? Retrouve tes données</div>
+              <div className="section-title" style={{ marginTop: 'var(--sp-lg)' }}>Connecte-toi ou crée ton compte</div>
               <AuthPanel />
               <div className="tertiary small" style={{ marginTop: 'var(--sp-xs)', textAlign: 'center' }}>
-                Connecte-toi pour synchroniser ton plan entre ton téléphone et ton ordinateur.
+                Ton plan te suit sur tous tes appareils (téléphone + ordinateur).
               </div>
             </>
+          )}
+
+          {(cloudUser || !cloudAvailable) && (
+            <Card style={{ marginTop: 'var(--sp-md)' }}>
+              {cloudUser && (
+                <div className="row between" style={{ marginBottom: 10 }}>
+                  <div className="tertiary small">Connecté : {cloudUser.email ?? cloudUser.name}</div>
+                  <button className="btn ghost small" onClick={() => void signOutCloud()}>Changer de compte</button>
+                </div>
+              )}
+              <div className="muted small" style={{ marginBottom: 10 }}>Créons ton profil pour générer ton plan sur mesure.</div>
+              <button className="btn primary block" onClick={() => setStep(1)}>Créer mon profil</button>
+            </Card>
           )}
         </>
       )}

@@ -21,7 +21,6 @@ export function Settings() {
   const setProgression = useStore((s) => s.setProgression);
   const setAvailability = useStore((s) => s.setAvailability);
   const setSettings = useStore((s) => s.setSettings);
-  const loadDemo = useStore((s) => s.loadDemo);
   const reset = useStore((s) => s.reset);
   const exportData = useStore((s) => s.exportData);
   const importData = useStore((s) => s.importData);
@@ -128,12 +127,11 @@ export function Settings() {
       <SectionTitle>Données & sauvegarde</SectionTitle>
       <Card>
         <div className="tertiary small" style={{ marginBottom: 10 }}>
-          Persistance locale active (cet appareil). Pour le multi-appareils : Firebase (recommandé) ou Google Drive — voir la doc. En attendant, exporte/importe le fichier JSON.
+          Sauvegarde locale (cet appareil) + synchro cloud si tu es connecté. Tu peux aussi exporter/importer un fichier JSON.
         </div>
         <div className="row wrap">
           <button className="btn" onClick={exportData}>⬇️ Exporter JSON</button>
           <button className="btn" onClick={() => fileRef.current?.click()}>⬆️ Importer JSON</button>
-          <button className="btn ghost" onClick={loadDemo}>🎭 Athlète démo</button>
         </div>
         <input ref={fileRef} type="file" accept="application/json" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) void importData(f); }} />
       </Card>
