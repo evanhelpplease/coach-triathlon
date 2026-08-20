@@ -99,6 +99,30 @@ export const useStore = create<AppStore>((set, get) => {
   /** Applique des données reçues (chargement, import, push distant). */
   const adopt = (data: AppData) => set({ data, plan: computePlan(data) });
 
+  /**
+   * Resynchronise l'agenda après un changement de plan — SEULEMENT si l'utilisateur
+   * a déjà connecté Google cette session (sinon on n'ouvre pas de popup). Best-effort.
+   */
+  const autoSyncCalendar = async () => {
+    const { data, plan } = get();
+    if (!plan || !data.settings.calendarAutoSync || !data.settings.googleClientId) return;
+    try {
+      const mod = await import('../services/calendarSync');
+      if (!mod.isConnected()) return;
+      const today = startOfDay(new Date());
+      const upcoming = plan.sessions.filter((s) => s.date >= today);
+      const { calendarId } = await mod.syncSessions(upcoming, data.settings.googleCalendarId);
+      if (calendarId !== data.settings.googleCalendarId) {
+        const d = structuredClone(get().data);
+        d.settings.googleCalendarId = calendarId;
+        set({ data: d });
+        saveAll(d);
+      }
+    } catch {
+      /* synchro silencieuse : en cas d'échec, l'utilisateur peut resync manuellement */
+    }
+  };
+
   /** Câble la réconciliation + l'abonnement temps réel après connexion. */
   const wireCloud = async (provider: SyncProvider, user: CloudUser) => {
     cloud = provider;
@@ -158,6 +182,7 @@ export const useStore = create<AppStore>((set, get) => {
       mutator(data);
       set({ data, plan: regenerate ? computePlan(data) : get().plan });
       saveAll(data);
+      if (regenerate) void autoSyncCalendar();
     },
 
     regeneratePlan: () => {
@@ -165,6 +190,7 @@ export const useStore = create<AppStore>((set, get) => {
       data.planGeneratedAt = new Date().toISOString();
       set({ data, plan: computePlan(data) });
       saveAll(data);
+      void autoSyncCalendar();
     },
 
     loadDemo: () => {

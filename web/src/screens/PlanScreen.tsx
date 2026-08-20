@@ -72,7 +72,7 @@ export function PlanScreen() {
       setSyncMsg(`Synchronisation de ${upcoming.length} séances…`);
       const { report, calendarId } = await syncSessions(upcoming, data.settings.googleCalendarId);
       if (calendarId !== data.settings.googleCalendarId) update((d) => { d.settings.googleCalendarId = calendarId; });
-      setSyncMsg(`Calendrier « Coach Triathlon IA » synchronisé : ${report.created} créées, ${report.updated} mises à jour${report.failed ? `, ${report.failed} échecs` : ''}.`);
+      setSyncMsg(`Calendrier « Coach Triathlon IA » synchronisé : ${report.created} créées, ${report.updated} mises à jour, ${report.deleted} retirées${report.failed ? `, ${report.failed} échecs` : ''}.`);
     } catch (e) {
       setSyncMsg(`Échec : ${(e as Error).message}`);
     }

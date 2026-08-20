@@ -117,7 +117,7 @@ export function Settings() {
           <span>Resynchroniser à chaque changement de plan</span>
           <input type="checkbox" checked={data.settings.calendarAutoSync} onChange={(e) => setSettings({ calendarAutoSync: e.target.checked })} />
         </label>
-        <div className="tertiary small">Accès restreint : l'app crée un calendrier <b>« Coach Triathlon IA »</b> dédié et n'écrit que dedans — elle ne voit ni ne modifie tes autres événements. Prérequis : projet Google Cloud, Calendar API activée, OAuth client ID (Web) avec ton origine GitHub Pages. La synchro se lance depuis l'onglet Plan.</div>
+        <div className="tertiary small">Après une 1re synchro manuelle (onglet Plan), l'agenda se met à jour <b>tout seul</b> à chaque changement de plan tant que ta session Google est active — y compris en <b>retirant</b> les séances supprimées. Accès restreint : l'app crée un calendrier <b>« Coach Triathlon IA »</b> dédié et n'écrit que dedans (elle ne voit pas tes autres événements). Prérequis : Calendar API activée + OAuth client ID (Web) avec ton origine.</div>
       </Card>
 
       <SectionTitle>Compte & synchro (multi-appareils)</SectionTitle>
