@@ -5,6 +5,7 @@ import {
   type PlannedSession, type Sport, type StepTarget, type WorkoutStep, type CompletedActivity,
 } from '@engine/index';
 import { useStore, type ActualSession } from '../app/store';
+import { downloadFitWorkout } from '../services/fitWorkout';
 import { adaptedPlan } from '../app/derive';
 import { Card, SectionTitle, Pill, Banner } from '../ui/components';
 import { hms, intentLabel, mmss, sportColor, sportEmoji, sportLabel } from '../ui/format';
@@ -342,13 +343,15 @@ export function SessionDetail() {
           <div className="row wrap" style={{ marginTop: 'var(--sp-sm)' }}>
             <button className="btn" onClick={() => setShowForm(true)}>✏️ Modifier</button>
             <button className="btn ghost danger" onClick={() => unmarkSessionDone(session)}>↩️ Annuler</button>
-            {session.sport === 'bike' && <button className="btn ghost" onClick={() => exportZwo(session)}>⬇️ Export .ZWO</button>}
+            <button className="btn ghost" onClick={() => downloadFitWorkout(session)}>⌚ Garmin (.FIT)</button>
+            {session.sport === 'bike' && <button className="btn ghost" onClick={() => exportZwo(session)}>⬇️ .ZWO</button>}
           </div>
         </div>
       ) : (
         <div className="row wrap" style={{ marginTop: 'var(--sp-lg)' }}>
           <button className="btn accent" onClick={() => setShowForm(true)}>✅ Marquer réalisée</button>
-          {session.sport === 'bike' && <button className="btn ghost" onClick={() => exportZwo(session)}>⬇️ Export .ZWO</button>}
+          <button className="btn ghost" onClick={() => downloadFitWorkout(session)}>⌚ Garmin (.FIT)</button>
+          {session.sport === 'bike' && <button className="btn ghost" onClick={() => exportZwo(session)}>⬇️ .ZWO</button>}
         </div>
       )}
     </div>
