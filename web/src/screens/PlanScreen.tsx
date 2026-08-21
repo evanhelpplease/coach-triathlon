@@ -126,7 +126,7 @@ export function PlanScreen() {
               {items.map((it) =>
                 it.kind === 'race'
                   ? <RaceRow key={it.race.id} race={it.race} />
-                  : <SessionRow key={it.session.id} session={it.session} to={`/session/${it.session.id}`} />,
+                  : <SessionRow key={it.session.id} session={it.session} to={`/session/${it.session.id}`} done={data.activities.some((a) => a.id === `done-${it.session.id}`)} />,
               )}
             </div>
           ) : (

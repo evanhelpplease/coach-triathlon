@@ -104,4 +104,22 @@ describe('Évaluation de la récupération', () => {
     );
     expect(bad.level).toBe('low');
   });
+
+  it('nuit de 2h ne peut jamais être « au top », même sans autre signal', () => {
+    // Sommeil très court seul, ressenti neutre (3/5) : ne doit PAS donner good.
+    const r = new ReadinessEvaluator().assess(
+      { date: start, sleepHours: 2, subjective: { form: 3, sleepQuality: 2, soreness: 3, motivation: 3 } },
+      hist,
+    );
+    expect(r.level).toBe('low'); // < 3 h → repos impératif
+    expect(r.level).not.toBe('good');
+  });
+
+  it('nuit de 4h30 bride à moderate au mieux', () => {
+    const r = new ReadinessEvaluator().assess(
+      { date: start, sleepHours: 4.5, subjective: { form: 4, sleepQuality: 3, soreness: 4, motivation: 4 } },
+      hist,
+    );
+    expect(r.level).not.toBe('good');
+  });
 });

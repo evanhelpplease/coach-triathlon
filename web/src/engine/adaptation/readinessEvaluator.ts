@@ -44,14 +44,19 @@ export class ReadinessEvaluator {
       }
     }
 
-    // Sommeil
+    // Sommeil — malus PROGRESSIF (une nuit très courte doit peser lourd).
     if (today.sleepHours != null) {
-      if (today.sleepHours < 6) {
-        score -= 20;
-        reasons.push(`Nuit courte (${today.sleepHours.toFixed(1)} h).`);
-      } else if (today.sleepHours < 7) {
-        score -= 10;
-        reasons.push('Sommeil un peu juste.');
+      const h = today.sleepHours;
+      let pen = 0;
+      if (h < 3) pen = 55;
+      else if (h < 4) pen = 45;
+      else if (h < 5) pen = 33;
+      else if (h < 6) pen = 22;
+      else if (h < 7) pen = 10;
+      else if (h < 7.5) pen = 4;
+      if (pen > 0) {
+        score -= pen;
+        reasons.push(`Nuit ${h < 5 ? 'très ' : ''}courte (${h.toFixed(1)} h).`);
       }
     }
 
@@ -70,7 +75,18 @@ export class ReadinessEvaluator {
     }
 
     score = Math.max(0, Math.min(100, score));
-    const level: ReadinessLevel = score >= 70 ? 'good' : score >= 45 ? 'moderate' : 'low';
+    let level: ReadinessLevel = score >= 70 ? 'good' : score >= 45 ? 'moderate' : 'low';
+
+    // Garde-fous sécurité : un facteur critique ne peut jamais donner « au top ».
+    const s = today.subjective;
+    const veryLowSleep = today.sleepHours != null && today.sleepHours < 4;
+    const veryBadFeel = !!s && (s.form <= 1 || s.soreness <= 1);
+    if ((veryLowSleep || veryBadFeel) && level === 'good') level = 'moderate';
+    // Nuit quasi blanche ou ressenti + courbatures au plus bas → repos impératif.
+    if ((today.sleepHours != null && today.sleepHours < 3) || (!!s && s.form <= 1 && s.soreness <= 1)) {
+      level = 'low';
+    }
+
     if (reasons.length === 0) reasons.push('Bonne récupération, prêt à performer.');
     return { level, score, reasons };
   }

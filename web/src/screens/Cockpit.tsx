@@ -181,7 +181,7 @@ export function Cockpit() {
       {todaySessions.length > 0 ? (
         <div className="stack-sm">
           {todaySessions.map((s) => (
-            <SessionRow key={s.id} session={s} to={`/session/${s.id}`} />
+            <SessionRow key={s.id} session={s} to={`/session/${s.id}`} done={data.activities.some((a) => a.id === `done-${s.id}`)} />
           ))}
         </div>
       ) : (

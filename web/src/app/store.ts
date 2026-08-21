@@ -15,6 +15,7 @@ import {
   type ProgressionLevel,
   type TrainingPlan,
   type TemporaryUnavailability,
+  type PlannedSession,
   newActivityId,
 } from '@engine/index';
 import { emptyAppData, demoAppData, type AppData, type AppSettings } from './model';
@@ -62,6 +63,8 @@ interface AppStore {
 
   toggleChecklistItem: (raceId: string, key: string) => void;
 
+  markSessionDone: (session: PlannedSession) => void;
+  unmarkSessionDone: (session: PlannedSession) => void;
   addActivity: (a: Omit<CompletedActivity, 'id'> & { id?: string }) => void;
   addActivities: (list: Array<Omit<CompletedActivity, 'id'> & { id?: string }>) => void;
   removeActivity: (id: string) => void;
@@ -241,6 +244,19 @@ export const useStore = create<AppStore>((set, get) => {
         d.raceChecklists = { ...d.raceChecklists, [raceId]: [...cur] };
       }),
 
+    markSessionDone: (session) =>
+      get().update((d) => {
+        const id = `done-${session.id}`;
+        if (d.activities.some((a) => a.id === id)) return; // déjà marquée → pas de doublon
+        d.activities = [
+          ...d.activities,
+          { id, sport: session.sport, start: session.date, duration: session.estimatedDuration, rpe: 6, source: 'manual' },
+        ];
+      }),
+    unmarkSessionDone: (session) =>
+      get().update((d) => {
+        d.activities = d.activities.filter((a) => a.id !== `done-${session.id}`);
+      }),
     addActivity: (a) => get().update((d) => { d.activities = [...d.activities, { ...a, id: a.id ?? newActivityId() }]; }),
     addActivities: (list) =>
       get().update((d) => {

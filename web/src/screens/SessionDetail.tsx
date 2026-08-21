@@ -169,12 +169,15 @@ export function SessionDetail() {
   const nav = useNavigate();
   const data = useStore((s) => s.data);
   const plan = useStore((s) => s.plan);
-  const addActivity = useStore((s) => s.addActivity);
+  const markSessionDone = useStore((s) => s.markSessionDone);
+  const unmarkSessionDone = useStore((s) => s.unmarkSessionDone);
 
   const session = useMemo(() => {
     const adapt = adaptedPlan(data, plan);
     return adapt.plan.find((s) => s.id === id) ?? plan?.sessions.find((s) => s.id === id) ?? null;
   }, [data, plan, id]);
+
+  const isDone = session != null && data.activities.some((a) => a.id === `done-${session.id}`);
 
   if (!session) {
     return (
@@ -183,18 +186,6 @@ export function SessionDetail() {
         <Card style={{ marginTop: 12 }}>Séance introuvable.</Card>
       </div>
     );
-  }
-
-  function markDone() {
-    if (!session) return;
-    addActivity({
-      sport: session.sport,
-      start: session.date,
-      duration: session.estimatedDuration,
-      rpe: 6,
-      source: 'manual',
-    });
-    nav('/journal');
   }
 
   return (
@@ -227,9 +218,17 @@ export function SessionDetail() {
             <TestResultForm sport={session.sport} />
           </div>
         </div>
+      ) : isDone ? (
+        <div style={{ marginTop: 'var(--sp-lg)' }}>
+          <Banner kind="success">✅ Séance marquée comme réalisée — elle compte dans ta charge et ton analyse.</Banner>
+          <div className="row wrap" style={{ marginTop: 'var(--sp-sm)' }}>
+            <button className="btn ghost" onClick={() => unmarkSessionDone(session)}>↩️ Annuler</button>
+            {session.sport === 'bike' && <button className="btn ghost" onClick={() => exportZwo(session)}>⬇️ Export .ZWO</button>}
+          </div>
+        </div>
       ) : (
         <div className="row wrap" style={{ marginTop: 'var(--sp-lg)' }}>
-          <button className="btn accent" onClick={markDone}>✅ Marquer réalisée</button>
+          <button className="btn accent" onClick={() => markSessionDone(session)}>✅ Marquer réalisée</button>
           {session.sport === 'bike' && <button className="btn ghost" onClick={() => exportZwo(session)}>⬇️ Export .ZWO</button>}
         </div>
       )}

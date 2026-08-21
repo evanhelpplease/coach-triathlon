@@ -78,9 +78,9 @@ export function TSBRing({ tsb, ctl, atl }: { tsb: number; ctl: number; atl: numb
   );
 }
 
-export function SessionRow({ session, to, note }: { session: PlannedSession; to?: string; note?: string }) {
+export function SessionRow({ session, to, note, done }: { session: PlannedSession; to?: string; note?: string; done?: boolean }) {
   const body = (
-    <div className="session">
+    <div className="session" style={done ? { opacity: 0.68 } : undefined}>
       <div className="badge" style={{ background: `color-mix(in srgb, ${sportColor(session.sport)} 22%, transparent)` }}>
         {sportEmoji(session.sport)}
       </div>
@@ -91,7 +91,10 @@ export function SessionRow({ session, to, note }: { session: PlannedSession; to?
           {note ? ` · ${note}` : ''}
         </div>
       </div>
-      <div className="tertiary small">{dateFr(session.date)}</div>
+      <div className="tertiary small">
+        {done && <span style={{ color: 'var(--success)', marginRight: 6 }}>✓ fait</span>}
+        {dateFr(session.date)}
+      </div>
     </div>
   );
   return to ? <Link to={to} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>{body}</Link> : body;
