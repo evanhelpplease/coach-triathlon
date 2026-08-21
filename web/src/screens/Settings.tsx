@@ -29,6 +29,8 @@ export function Settings() {
   const removeUnavailability = useStore((s) => s.removeUnavailability);
   const fileRef = useRef<HTMLInputElement>(null);
   const [clientId, setClientId] = useState(data.settings.googleClientId ?? '');
+  const [orsKey, setOrsKey] = useState(data.settings.orsApiKey ?? '');
+  const [homeAddr, setHomeAddr] = useState(data.settings.homeAddress ?? '');
   const [installable, setInstallable] = useState(canInstall());
   useEffect(() => {
     const on = () => setInstallable(canInstall());
@@ -118,6 +120,17 @@ export function Settings() {
           <input type="checkbox" checked={data.settings.calendarAutoSync} onChange={(e) => setSettings({ calendarAutoSync: e.target.checked })} />
         </label>
         <div className="tertiary small">Après une 1re synchro manuelle (onglet Plan), l'agenda se met à jour <b>tout seul</b> à chaque changement de plan tant que ta session Google est active — y compris en <b>retirant</b> les séances supprimées. Accès restreint : l'app crée un calendrier <b>« Coach Triathlon IA »</b> dédié et n'écrit que dedans (elle ne voit pas tes autres événements). Prérequis : Calendar API activée + OAuth client ID (Web) avec ton origine.</div>
+      </Card>
+
+      <SectionTitle>Parcours vélo (GPX)</SectionTitle>
+      <Card>
+        <div className="field"><label>Adresse de départ</label>
+          <input className="input" value={homeAddr} placeholder="36 rue Michelet, 94200 Ivry-sur-Seine" onChange={(e) => setHomeAddr(e.target.value)} onBlur={() => setSettings({ homeAddress: homeAddr.trim() || undefined })} />
+        </div>
+        <div className="field" style={{ marginBottom: 8 }}><label>Clé API OpenRouteService</label>
+          <input className="input" value={orsKey} placeholder="5b3ce…" onChange={(e) => setOrsKey(e.target.value)} onBlur={() => setSettings({ orsApiKey: orsKey.trim() || undefined })} />
+        </div>
+        <div className="tertiary small">Crée une clé gratuite sur openrouteservice.org (Dashboard → Request a token). Ensuite, depuis le détail d'une séance vélo : « 🗺️ Parcours (.gpx) » génère une boucle road-snappée de la bonne distance (option via Vincennes / Longchamp), importable dans Garmin (Parcours), Komoot ou Strava.</div>
       </Card>
 
       <SectionTitle>Compte & synchro (multi-appareils)</SectionTitle>

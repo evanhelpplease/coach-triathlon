@@ -29,6 +29,10 @@ export interface AppSettings {
   googleCalendarId?: string;
   /** Synchro agenda auto à chaque changement de plan. */
   calendarAutoSync: boolean;
+  /** Clé API OpenRouteService (parcours vélo GPX). */
+  orsApiKey?: string;
+  /** Adresse de départ des parcours vélo. */
+  homeAddress?: string;
 }
 
 export interface AppData {
@@ -50,7 +54,7 @@ export interface AppData {
 }
 
 export function defaultSettings(): AppSettings {
-  return { poolMeters: 25, startingWeeklyLoad: 300, calendarAutoSync: true };
+  return { poolMeters: 25, startingWeeklyLoad: 300, calendarAutoSync: true, homeAddress: '36 rue Michelet, 94200 Ivry-sur-Seine' };
 }
 
 export function emptyAppData(): AppData {

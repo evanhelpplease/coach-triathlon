@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  isTestSession, vdotFromVMATest, vmaFromTest, ftpFrom20minTest, cssFromTest,
+  isTestSession, vdotFromVMATest, vmaFromTest, ftpFrom20minTest, cssFromTest, CyclingPowerModel,
   type PlannedSession, type Sport, type StepTarget, type WorkoutStep, type CompletedActivity,
 } from '@engine/index';
 import { useStore, type ActualSession } from '../app/store';
@@ -259,6 +259,60 @@ function CompletionForm({ session, onDone }: { session: PlannedSession; onDone: 
   );
 }
 
+/** Distance vélo cible (m) estimée depuis la durée et une allure endurance personnalisée. */
+function bikeTargetMeters(session: PlannedSession, ftp: number | undefined, weightKg: number, bikeType: 'road' | 'tt' | 'gravel' | 'mtb' | 'trainer', aeroBars: boolean, bikeWeightKg: number | undefined): number {
+  let speed = 26 / 3.6; // m/s par défaut (~26 km/h)
+  if (ftp) {
+    const cda = CyclingPowerModel.typicalCdA(bikeType, aeroBars);
+    const model = new CyclingPowerModel({ totalMassKg: weightKg + (bikeWeightKg ?? 9), cda });
+    speed = model.speed(0.65 * ftp);
+  }
+  return Math.max(3000, Math.round(speed * session.estimatedDuration));
+}
+
+/** Génération de parcours vélo GPX via OpenRouteService. */
+function BikeRoutePanel({ session }: { session: PlannedSession }) {
+  const data = useStore((s) => s.data);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const key = data.settings.orsApiKey;
+  const addr = data.settings.homeAddress ?? '';
+  const targetM = bikeTargetMeters(session, data.profile?.ftpWatts, data.profile?.weightKg ?? 72, data.equipment.bikeType ?? 'road', data.equipment.hasAeroBars, data.equipment.bikeWeightKg);
+  const targetKm = Math.round(targetM / 100) / 10;
+
+  async function gen(kind: 'loop' | 'vincennes' | 'longchamp') {
+    setMsg(null);
+    if (!key) { setMsg('Ajoute ta clé OpenRouteService dans Réglages → Parcours vélo.'); return; }
+    if (!addr) { setMsg('Renseigne ton adresse de départ dans Réglages.'); return; }
+    setBusy(true);
+    try {
+      const mod = await import('../services/gpxRoute');
+      setMsg('Calcul du parcours…');
+      const start = await mod.geocode(key, addr);
+      const gpx = kind === 'loop' ? await mod.roundTripGpx(key, start, targetM) : await mod.viaGpx(key, start, mod.LANDMARKS[kind].coord);
+      mod.downloadGpx(gpx, `${session.title}-${kind}`);
+      setMsg('Parcours .gpx téléchargé ✅ — importe-le dans Garmin (Parcours), Komoot ou Strava.');
+    } catch (e) {
+      setMsg((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card>
+      <div style={{ fontWeight: 600 }}>🗺️ Parcours vélo (.gpx)</div>
+      <div className="tertiary small" style={{ marginTop: 2 }}>Départ : {addr || '— (à renseigner en Réglages)'} · boucle ~{targetKm} km</div>
+      <div className="row wrap" style={{ marginTop: 8 }}>
+        <button className="btn" disabled={busy} onClick={() => void gen('loop')}>Boucle {targetKm} km</button>
+        <button className="btn ghost" disabled={busy} onClick={() => void gen('vincennes')}>Via Vincennes</button>
+        <button className="btn ghost" disabled={busy} onClick={() => void gen('longchamp')}>Via Longchamp</button>
+      </div>
+      {msg && <div className="banner" style={{ marginTop: 8 }}>{msg}</div>}
+    </Card>
+  );
+}
+
 export function SessionDetail() {
   const { id } = useParams();
   const nav = useNavigate();
@@ -306,6 +360,13 @@ export function SessionDetail() {
         ))}
         {session.steps.length === 0 && <Card className="muted">Séance à matérialiser (substitution matériel).</Card>}
       </div>
+
+      {session.sport === 'bike' && !isTestSession(session) && (
+        <>
+          <SectionTitle>Parcours</SectionTitle>
+          <BikeRoutePanel session={session} />
+        </>
+      )}
 
       {isTestSession(session) ? (
         <div style={{ marginTop: 'var(--sp-lg)' }}>
