@@ -8,6 +8,7 @@ import { RaceDay } from './screens/RaceDay';
 import { Journal } from './screens/Journal';
 import { Analysis } from './screens/Analysis';
 import { Predictions } from './screens/Predictions';
+import { ZonesScreen } from './screens/ZonesScreen';
 import { Races } from './screens/Races';
 import { Injuries } from './screens/Injuries';
 import { Settings } from './screens/Settings';
@@ -72,6 +73,7 @@ export function App() {
           <Route path="/journal" element={<Journal />} />
           <Route path="/analysis" element={<Analysis />} />
           <Route path="/predictions" element={<Predictions />} />
+          <Route path="/zones" element={<ZonesScreen />} />
           <Route path="/races" element={<Races />} />
           <Route path="/injuries" element={<Injuries />} />
           <Route path="/settings" element={<Settings />} />

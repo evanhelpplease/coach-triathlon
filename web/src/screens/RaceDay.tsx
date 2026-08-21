@@ -11,7 +11,7 @@ import { raceChecklist } from '../data/raceChecklist';
 
 const FORMAT_LABEL: Record<string, string> = {
   xs: 'XS', sprint: 'Sprint', olympic: 'Olympique (M)', half: 'Half (70.3)', full: 'Full (140.6)',
-  run10k: '10 km', halfMarathon: 'Semi-marathon', marathon: 'Marathon',
+  run5k: '5 km', run10k: '10 km', halfMarathon: 'Semi-marathon', marathon: 'Marathon',
 };
 
 function splitRow(label: string, sec: number | null | undefined, color?: string) {

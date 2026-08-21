@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import {
-  RacePredictor, RaceNutrition, RacePacing, raceGoalGap, startOfDay,
+  RacePredictor, RaceNutrition, RacePacing, raceGoalGap, runMeters, RUN_FORMATS, startOfDay,
   type RaceFormat, type RacePrediction,
 } from '@engine/index';
 import { useStore } from '../app/store';
@@ -10,7 +10,7 @@ import { hms, mmss, clock, sportColor } from '../ui/format';
 const TRI_FORMATS: RaceFormat[] = ['xs', 'sprint', 'olympic', 'half', 'full'];
 const FORMAT_LABEL: Record<string, string> = {
   xs: 'XS', sprint: 'Sprint', olympic: 'Olympique (M)', half: 'Half (70.3)', full: 'Full (140.6)',
-  run10k: '10 km', halfMarathon: 'Semi', marathon: 'Marathon',
+  run5k: '5 km', run10k: '10 km', halfMarathon: 'Semi-marathon', marathon: 'Marathon',
 };
 
 function splitRow(label: string, sec: number | null | undefined, color?: string) {
@@ -134,7 +134,30 @@ export function Predictions() {
         <div className="small muted" style={{ marginTop: 10 }}>{nutrition.summary}</div>
       </Card>
 
-      <SectionTitle>Projections tous formats</SectionTitle>
+      <SectionTitle>🏃 Course à pied (chrono & allure)</SectionTitle>
+      <Card>
+        {data.profile.vdot != null || data.profile.vma != null ? (
+          <div className="stack-sm">
+            <div className="row between small tertiary" style={{ fontWeight: 600 }}>
+              <span>Distance</span><span>Chrono · Allure</span>
+            </div>
+            {RUN_FORMATS.map((f) => {
+              const p = predictor.predict(f, data.profile!, data.equipment);
+              const pace = p.totalSeconds / (runMeters(f) / 1000);
+              return (
+                <div key={f} className="row between small">
+                  <span style={{ color: sportColor('run') }}>{FORMAT_LABEL[f]}</span>
+                  <span className="num">{hms(p.totalSeconds)} · {mmss(pace)}/km</span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="muted small">Renseigne ta VMA ou ton VDOT (Réglages) pour tes chronos course à pied.</div>
+        )}
+      </Card>
+
+      <SectionTitle>Projections triathlon</SectionTitle>
       <Card>
         <div className="stack-sm">
           {TRI_FORMATS.map((f) => {

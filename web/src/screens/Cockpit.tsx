@@ -219,6 +219,7 @@ export function Cockpit() {
 
       <div style={{ marginTop: 'var(--sp-md)' }} className="row wrap">
         <Link className="btn ghost" to="/predictions">🔮 Prédictions</Link>
+        <Link className="btn ghost" to="/zones">🎯 Mes zones</Link>
         <Link className="btn ghost" to="/injuries">🩹 Blessures</Link>
         <Link className="btn ghost" to="/races">🏁 Courses</Link>
       </div>

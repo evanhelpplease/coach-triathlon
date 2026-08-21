@@ -204,7 +204,7 @@ export function Onboarding() {
             <div className="field grow"><label>Format</label>
               <select className="select" value={d.raceFormat} onChange={(e) => set('raceFormat', e.target.value as RaceFormat)}>
                 <option value="xs">XS</option><option value="sprint">Sprint</option><option value="olympic">Olympique (M)</option><option value="half">Half 70.3</option><option value="full">Full 140.6</option>
-                <option value="run10k">10 km</option><option value="halfMarathon">Semi</option><option value="marathon">Marathon</option>
+                <option value="run5k">5 km</option><option value="run10k">10 km</option><option value="halfMarathon">Semi</option><option value="marathon">Marathon</option>
               </select>
             </div>
             <div className="field grow"><label>Objectif (h:mm:ss)</label><input className="input" value={d.raceGoal} onChange={(e) => set('raceGoal', e.target.value)} placeholder="2:15:00" /></div>

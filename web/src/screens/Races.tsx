@@ -10,6 +10,7 @@ const FORMATS: { value: RaceFormat; label: string }[] = [
   { value: 'olympic', label: 'Olympique (M)' },
   { value: 'half', label: 'Half 70.3' },
   { value: 'full', label: 'Full 140.6' },
+  { value: 'run5k', label: '5 km' },
   { value: 'run10k', label: '10 km' },
   { value: 'halfMarathon', label: 'Semi' },
   { value: 'marathon', label: 'Marathon' },

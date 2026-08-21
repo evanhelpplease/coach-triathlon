@@ -29,6 +29,19 @@ const local = new LocalProvider();
 let cloud: SyncProvider | null = null;
 let cloudUnsub: (() => void) | null = null;
 
+/** Données réelles saisies à la fin d'une séance (boucle la charge & l'analyse). */
+export interface ActualSession {
+  duration: number;
+  distanceM?: number;
+  avgHr?: number;
+  maxHr?: number;
+  avgPowerW?: number;
+  normalizedPowerW?: number;
+  avgPaceSecPerKm?: number;
+  poolLengths?: number;
+  rpe?: number;
+}
+
 interface AppStore {
   data: AppData;
   plan: TrainingPlan | null;
@@ -63,7 +76,7 @@ interface AppStore {
 
   toggleChecklistItem: (raceId: string, key: string) => void;
 
-  markSessionDone: (session: PlannedSession) => void;
+  completeSession: (session: PlannedSession, actual: ActualSession) => void;
   unmarkSessionDone: (session: PlannedSession) => void;
   addActivity: (a: Omit<CompletedActivity, 'id'> & { id?: string }) => void;
   addActivities: (list: Array<Omit<CompletedActivity, 'id'> & { id?: string }>) => void;
@@ -244,14 +257,11 @@ export const useStore = create<AppStore>((set, get) => {
         d.raceChecklists = { ...d.raceChecklists, [raceId]: [...cur] };
       }),
 
-    markSessionDone: (session) =>
+    completeSession: (session, actual) =>
       get().update((d) => {
         const id = `done-${session.id}`;
-        if (d.activities.some((a) => a.id === id)) return; // déjà marquée → pas de doublon
-        d.activities = [
-          ...d.activities,
-          { id, sport: session.sport, start: session.date, duration: session.estimatedDuration, rpe: 6, source: 'manual' },
-        ];
+        const others = d.activities.filter((a) => a.id !== id); // upsert : pas de doublon
+        d.activities = [...others, { id, sport: session.sport, start: session.date, source: 'manual', ...actual }];
       }),
     unmarkSessionDone: (session) =>
       get().update((d) => {

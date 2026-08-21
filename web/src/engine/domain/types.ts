@@ -48,13 +48,17 @@ export type RaceFormat =
   | 'half'
   | 'full'
   // mono-sport course
+  | 'run5k'
   | 'run10k'
   | 'halfMarathon'
   | 'marathon';
 
 export const ALL_RACE_FORMATS: RaceFormat[] = [
-  'xs', 'sprint', 'olympic', 'half', 'full', 'run10k', 'halfMarathon', 'marathon',
+  'xs', 'sprint', 'olympic', 'half', 'full', 'run5k', 'run10k', 'halfMarathon', 'marathon',
 ];
+
+/** Formats course à pied seuls (mono-sport). */
+export const RUN_FORMATS: RaceFormat[] = ['run5k', 'run10k', 'halfMarathon', 'marathon'];
 
 /** Distance natation (m) du format, ou null si non concerné. */
 export function swimMeters(f: RaceFormat): number | null {
@@ -88,6 +92,7 @@ export function runMeters(f: RaceFormat): number {
     case 'olympic': return 10_000;
     case 'half': return 21_097.5;
     case 'full': return 42_195;
+    case 'run5k': return 5_000;
     case 'run10k': return 10_000;
     case 'halfMarathon': return 21_097.5;
     case 'marathon': return 42_195;

@@ -9,7 +9,7 @@ import { syncSessions, connectGoogle } from '../services/calendarSync';
 import { downloadICS } from '../services/icsExport';
 
 const FORMAT_SHORT: Record<string, string> = {
-  xs: 'XS', sprint: 'Sprint', olympic: 'M', half: '70.3', full: '140.6', run10k: '10 km', halfMarathon: 'Semi', marathon: 'Marathon',
+  xs: 'XS', sprint: 'Sprint', olympic: 'M', half: '70.3', full: '140.6', run5k: '5 km', run10k: '10 km', halfMarathon: 'Semi', marathon: 'Marathon',
 };
 
 function RaceRow({ race }: { race: Race }) {

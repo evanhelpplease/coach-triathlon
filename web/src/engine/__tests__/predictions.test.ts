@@ -146,4 +146,21 @@ describe('Prédiction de course assemblée', () => {
     const b = new RacePredictor().predict('olympic', fullProfile(), suit);
     expect(b.swimSeconds ?? 0).toBeLessThan(a.swimSeconds ?? 0);
   });
+
+  it('prédictions course : 5K < 10K < Semi < Marathon, mono-sport (pas de nat/vélo)', () => {
+    const p = new RacePredictor();
+    const eq = makeEquipment();
+    const t5 = p.predict('run5k', fullProfile(), eq);
+    const t10 = p.predict('run10k', fullProfile(), eq);
+    const semi = p.predict('halfMarathon', fullProfile(), eq);
+    const mara = p.predict('marathon', fullProfile(), eq);
+    expect(t5.swimSeconds).toBeNull();
+    expect(t5.bikeSeconds).toBeNull();
+    expect(t5.totalSeconds).toBeLessThan(t10.totalSeconds);
+    expect(t10.totalSeconds).toBeLessThan(semi.totalSeconds);
+    expect(semi.totalSeconds).toBeLessThan(mara.totalSeconds);
+    // VDOT 52 → 5 km autour de 18–20 min.
+    expect(t5.totalSeconds).toBeGreaterThan(16 * 60);
+    expect(t5.totalSeconds).toBeLessThan(21 * 60);
+  });
 });
